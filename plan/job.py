@@ -105,9 +105,10 @@ class Job(object):
     :param output: the output redirection for the task.
     """
 
-    def __init__(self, task, every, at=None, path=None,
-                 environment=None, output=None):
+    def __init__(self, task, every=None, at=None, path=None,
+                 environment=None, output=None, raw_time=None):
         self.task = task
+        self.raw_time= raw_time
         self.every = every
         self.at = at
         self.path = path
@@ -483,3 +484,22 @@ class RawJob(Job):
             '{task}'
         """
         return '{task}'
+
+
+class RawSyntaxCommandJob(Job):
+    """The command job, that support raw syntax
+    """
+
+    def task_template(self):
+        """Template::
+
+            '{task} {output}'
+        """
+        return '{task} {output}'
+
+    def validate_time(self):
+        if len(self.raw_time.split(" ")) != 5:
+            raise ValidationError('Invalid raw_time provided')
+
+    def parse_time(self):
+        return self.raw_time
